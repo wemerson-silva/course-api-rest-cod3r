@@ -1,2 +1,16 @@
-# course-api-rest-cod3r
-source api code, api teste!
+# Back End Api
+
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run production
+```
