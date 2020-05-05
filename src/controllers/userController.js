@@ -18,10 +18,13 @@ module.exports = app => {
         try {
             existsOrError(user.name, { error: 'Nome não informado' })
             existsOrError(user.email, { error: 'E-mail não informado' })
-            existsOrError(user.password, { error: 'Senha não informada' })
-            existsOrError(user.confirmPassword, { error: 'Confirmação de Senha inválida' })
-            equalsOrError(user.password, user.confirmPassword,
-                { error: 'Senhas não conferem' })
+
+            if (!req.params.id) {
+                existsOrError(user.password, { error: 'Senha não informada' })
+                existsOrError(user.confirmPassword, { error: 'Confirmação de Senha inválida' })
+                equalsOrError(user.password, user.confirmPassword,
+                    { error: 'Senhas não conferem' })
+            }
 
             const userFromDB = await app.dataBase('users')
                 .where({ email: user.email }).first()
@@ -35,9 +38,22 @@ module.exports = app => {
         user.password = encryptPassword(user.password)
         delete user.confirmPassword
 
+
+
+
         if (user.id) {
+            const updateUser = { ...req.body }
+            var userUpdateUser = {};
+
+            if (updateUser.password < 0 || updateUser.password === null || updateUser.password === undefined) {
+                userUpdateUser = { name: updateUser.name, email: updateUser.email, admin: updateUser.admin }
+            } else {
+                userUpdateUser = { name: updateUser.name, email: updateUser.email, password: user.password, admin: updateUser.admin }
+
+            }
+            console.log(userUpdateUser)
             app.dataBase('users')
-                .update(user)
+                .update(userUpdateUser)
                 .where({ id: user.id })
                 .whereNull('deletedAt')
                 .then(_ => res.status(204).send({ sucess: 'Atualizado com sucesso.' }))
